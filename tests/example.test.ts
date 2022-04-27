@@ -1,4 +1,5 @@
 import {
+  Account,
   Accounts,
   beforeEach,
   Chain,
@@ -8,6 +9,7 @@ import {
   run,
 } from "../deps.ts";
 import { ExampleModel } from "../models/example.model.ts";
+import fc from 'https://cdn.skypack.dev/fast-check';
 
 let ctx: Context;
 let chain: Chain;
@@ -143,6 +145,41 @@ describe("[Example]", () => {
         example.getValue(4).expectSome().expectUint(6); // 3 + 2 + 1
         example.getValue(5).expectSome().expectUint(5); // 3 + 2  
         example.getValue(6).expectSome().expectUint(3); // 3
+      });
+
+      interface TestData { sender: Account, values: number[], numTxs: number };
+
+      it("succeeds and store values when called once or more per block over one or more blocks", () => {
+        const valuesMap = new Map();
+        fc.assert(fc.property(fc.record({
+            // fast-check generators are similar to haskell-hedgehog and QC.
+            sender: fc.constantFrom(...accounts.values()),
+            values: fc.array(fc.nat()),
+            numTxs: fc.integer(1, 100)
+          }),
+          (t: TestData) => {
+            const setValuesTx = example.setValues(t.values, t.sender);
+
+            // act
+            const receipt = chain.mineBlock(
+                [...Array(t.numTxs).keys()].map(() => setValuesTx)).receipts[0];
+
+            // assert
+            receipt.result.expectOk().expectBool(true);
+
+            let blockHeight = chain.blockHeight - 1;
+            for (let value of t.values) {
+              const existing = valuesMap.has(blockHeight) ? valuesMap.get(blockHeight) : 0;
+              valuesMap.set(blockHeight, value * t.numTxs + existing);
+
+              example
+                .getValue(blockHeight)
+                .expectSome()
+                .expectUint(valuesMap.get(blockHeight));
+              blockHeight++;
+            }
+          }), { numRuns: 10 } // 10 blocks.
+        );
       });
     });
   });
