@@ -5,8 +5,8 @@ import {
   it,
   run,
 } from "../deps.ts";
+import fc from "../fast-check.ts";
 import { CompositionRoot } from './ci/example.commands.ts'
-import fc from 'https://cdn.skypack.dev/fast-check';
 
 let ctx: Context;
 
@@ -19,7 +19,7 @@ describe("[Contract]", () => {
     it("appears to behave correctly when arbitrarily calling its API", () => {
       const currentState = { valuesMap: new Map(), isInitialized: false };
       fc.assert(fc.property(
-        CompositionRoot(ctx), (cmds: []) => {
+        CompositionRoot(ctx), (cmds) => {
           const initialState = () =>
             ({ model: currentState, real: ctx.chain });
           fc.modelRun(initialState, cmds);

@@ -1,6 +1,3 @@
-// @ts-nocheck
-// https://github.com/dubzzz/fast-check/issues/2781
-
 import {
   Account,
   Chain,
@@ -11,11 +8,10 @@ import {
   ExampleModel
 } from "../../models/example.model.ts";
 
-import fc
-  from 'https://cdn.skypack.dev/fast-check';
+import fc from "../../fast-check.ts"
 
 type State = {
-  valuesMap: Map,
+  valuesMap: Map<number, number>,
   isInitialized: boolean
 };
 
@@ -33,7 +29,7 @@ class InitializeCommand
     this.account = account;
   }
 
-  check(s: Readonly<State>): bool {
+  check(s: Readonly<State>): boolean {
     return s.isInitialized === false;
   }
 
@@ -69,7 +65,7 @@ class InitializeCommand_WhenAlreadyInitialized
     this.account = account;
   }
 
-  check(s: Readonly<State>): bool {
+  check(s: Readonly<State>): boolean {
     return s.isInitialized;
   }
 
@@ -101,8 +97,8 @@ class SetValuesCommand
   constructor(
       example: ExampleModel
     , account: Account
-    , values: Account
-    , numTxs: Account
+    , values: number[]
+    , numTxs: number
     ) {
     this.example = example;
     this.account = account;
@@ -110,7 +106,7 @@ class SetValuesCommand
     this.numTxs = numTxs;
   }
 
-  check(s: Readonly<State>): bool {
+  check(s: Readonly<State>): boolean {
     return s.isInitialized === true;
   }
 
@@ -126,13 +122,13 @@ class SetValuesCommand
 
     let bh = chain.blockHeight - 1;
     for (let value of this.values) {
-      const existing = state.valuesMap.has(bh) ? state.valuesMap.get(bh) : 0;
+      const existing = state.valuesMap.has(bh) ? state.valuesMap.get(bh)! : 0;
       state.valuesMap.set(bh, value * this.numTxs + existing);
 
       this.example
         .getValue(bh)
         .expectSome()
-        .expectUint(state.valuesMap.get(bh));
+        .expectUint(state.valuesMap.get(bh)!);
       bh++;
     }
 
@@ -155,8 +151,8 @@ class SetValuesCommand_WhenNotInitialized
   constructor(
       example: ExampleModel
     , account: Account
-    , values: Account
-    , numTxs: Account
+    , values: number[]
+    , numTxs: number
     ) {
     this.example = example;
     this.account = account;
@@ -164,7 +160,7 @@ class SetValuesCommand_WhenNotInitialized
     this.numTxs = numTxs;
   }
 
-  check(s: Readonly<State>): bool {
+  check(s: Readonly<State>): boolean {
     return s.isInitialized === false;
   }
 
@@ -186,7 +182,7 @@ class SetValuesCommand_WhenNotInitialized
   }
 }
 
-export function CompositionRoot(ctx: Context) {
+export function CompositionRoot(ctx: Context) { 
   const allCommands = [
     // Construct InitializeCommand
     fc.record({
