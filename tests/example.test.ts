@@ -1,6 +1,7 @@
 import {
   Account,
   Accounts,
+  afterEach,
   beforeEach,
   Chain,
   Context,
@@ -9,7 +10,7 @@ import {
   run,
 } from "../deps.ts";
 import { ExampleModel } from "../models/example.model.ts";
-import fc from 'https://cdn.skypack.dev/fast-check';
+import fc from "../fast-check.ts";
 
 let ctx: Context;
 let chain: Chain;
@@ -21,6 +22,10 @@ beforeEach(() => {
   chain = ctx.chain;
   accounts = ctx.accounts;
   example = ctx.models.get(ExampleModel);
+});
+
+afterEach(() => {
+  ctx.terminate();
 });
 
 describe("[Example]", () => {

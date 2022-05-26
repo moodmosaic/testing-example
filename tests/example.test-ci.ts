@@ -1,4 +1,5 @@
 import {
+  afterEach,
   beforeEach,
   Context,
   describe,
@@ -12,6 +13,10 @@ let ctx: Context;
 
 beforeEach(() => {
   ctx = new Context();
+});
+
+afterEach(() => {
+  ctx.terminate();
 });
 
 describe("[Contract]", () => {
