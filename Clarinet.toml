@@ -17,4 +17,3 @@ callee_filter = false
 
 [contracts.example]
 path = "contracts/example.clar"
-depends_on = []
