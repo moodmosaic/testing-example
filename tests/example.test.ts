@@ -1,6 +1,7 @@
 import {
   Account,
   Accounts,
+  afterEach,
   beforeEach,
   Chain,
   Context,
@@ -21,6 +22,10 @@ beforeEach(() => {
   chain = ctx.chain;
   accounts = ctx.accounts;
   example = ctx.models.get(ExampleModel);
+});
+
+afterEach(() => {
+  ctx.terminate();
 });
 
 describe("[Example]", () => {
