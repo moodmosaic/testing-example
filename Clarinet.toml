@@ -1,7 +1,7 @@
 
 [project]
 name = "testing-example"
-authors = ["LNow"]
+authors = ["LNow", "Nikos Baxevanis"]
 telemetry = false
 [repl.analysis]
 passes = ["check_checker"]
