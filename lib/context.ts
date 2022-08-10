@@ -9,10 +9,8 @@ export class Context {
   readonly deployer: Account;
 
   constructor(preSetupTx?: Array<Tx>) {
-    (Deno as any).core.ops();
-
     let result = JSON.parse(
-      (Deno as any).core.opSync("api/v1/new_session", {
+      Deno.core.opSync("api/v1/new_session", {
         name: "test",
         loadDeployment: true,
         deploymentPath: null,
